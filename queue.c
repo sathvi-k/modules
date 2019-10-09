@@ -12,17 +12,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "queue.h"
-
-typedef struct intqueue_t{
-	void *front;
-	void *back;
-}intqueue_t;
+#include <stdlib.h>
+#include <stdio.h>
 
 typedef struct element_t{
 	struct element_t *next;
 	void *data;
 }element_t;
 
+
+typedef struct iqueue_t{
+	element_t *front;
+	element_t *back;
+}iqueue_t;
 
 static element_t* create_element(void *elementp){
 	                            
@@ -40,38 +42,66 @@ static element_t* create_element(void *elementp){
 
 queue_t* qopen(void){
 	                            
- 	queue_t *qp;
+	iqueue_t *qp;
                                                                                 
-  if(!(qp=(queue_t*)malloc(sizeof(queue_t)))){                                       
+  if(!(qp=(iqueue_t*)malloc(sizeof(iqueue_t)))){                                       
     printf("[Error: malloc failed allocating queue]\n");                          
     return NULL;                                                                
-  }                                                                             
-                                                                                
+  }
+	
   qp->front=NULL;
 	qp->back=NULL;
   return qp;
 }
 
 void qclose(queue_t *qp){
-	if(qp->front != NULL && qp->back !=NULL){
-		void *i;
-			for(i=qp->front;i!=NULL;i=i->next){
-				free(i->data);
-				free(i);
-			}
+	iqueue_t *iqp=(iqueue_t*)qp;
+	
+	element_t *i=iqp->front;
+	element_t *save=NULL;
+	
+	while(i!=NULL){
+		free(i->data);
+		save=i->next;
+		free(i);
+		i=save;
 	}
-	free(qp);
+	free(iqp);
 }
 
 int32_t qput(queue_t *qp,void *elementp){
-	if(qp->front==NULL && qp->back=NULL){
-		qp->front=elementp;
-		qp->back=elementp;
+	element_t *element=create_element(elementp);
+	iqueue_t *iqp=(iqueue_t*)qp;
+	
+	if(iqp->front==NULL && iqp->back==NULL){
+		iqp->front=element;
+		iqp->back=element;
+		return 0;
 	}
 	else{
-		back->next=elementp;
-		
+		iqp->back->next=element;
+		iqp->back=element;
+		return 0;
 	}
+	return 1;
+}
+
+void* qget(queue_t *qp){
+	element_t *save=NULL;
+	iqueue_t *iqp=(iqueue_t*)qp;
+	
+	if(iqp->front!=NULL && iqp->back!=NULL){
+		save=iqp->front;
+		iqp->front=iqp->front->next;
+		
+		if(iqp->front==NULL){
+			iqp->back=NULL;
+		}
+	}
+	if(save==NULL){
+		return NULL;
+	}
+	return save->data;
 }
 
 	
