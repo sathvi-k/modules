@@ -20,35 +20,28 @@ typedef struct element_t{
 	void *data;
 }element_t;
 
-
 typedef struct iqueue_t{
 	element_t *front;
 	element_t *back;
 }iqueue_t;
 
-static element_t* create_element(void *elementp){
-	                            
+static element_t* create_element(void *elementp){              
  	element_t *et;
-                                                                                
-  if(!(et=(element_t*)malloc(sizeof(element_t)))){                                       
-    printf("[Error: malloc failed allocating element]\n");                          
-    return NULL;                                                                
-  }                                                                             
-                                                                                
+  if(!(et=(element_t*)malloc(sizeof(element_t)))){
+    printf("[Error: malloc failed allocating element]\n");
+    return NULL;
+  }
   et->next=NULL;
 	et->data=elementp;
   return et;
 }
 
-queue_t* qopen(void){
-	                            
+queue_t* qopen(void){               
 	iqueue_t *qp;
-                                                                                
-  if(!(qp=(iqueue_t*)malloc(sizeof(iqueue_t)))){                                       
-    printf("[Error: malloc failed allocating queue]\n");                          
-    return NULL;                                                                
+  if(!(qp=(iqueue_t*)malloc(sizeof(iqueue_t)))){
+    printf("[Error: malloc failed allocating queue]\n");
+    return NULL; 
   }
-	
   qp->front=NULL;
 	qp->back=NULL;
   return qp;
@@ -56,7 +49,6 @@ queue_t* qopen(void){
 
 void qclose(queue_t *qp){
 	iqueue_t *iqp=(iqueue_t*)qp;
-	
 	element_t *i=iqp->front;
 	element_t *save=NULL;
 	
@@ -93,7 +85,6 @@ void* qget(queue_t *qp){
 	if(iqp->front!=NULL && iqp->back!=NULL){
 		save=iqp->front;
 		iqp->front=iqp->front->next;
-		
 		if(iqp->front==NULL){
 			iqp->back=NULL;
 		}
@@ -104,4 +95,15 @@ void* qget(queue_t *qp){
 	return save->data;
 }
 
-	
+void qapply(queue_t *qp, void (*fn)(void* elementp)){
+	iqueue_t *iqp=(iqueue_t*)qp;
+	if (iqp->front!=NULL){
+		element_t *ep;
+		for(ep=front;ep!=NULL;ep=ep->next){
+			fn(ep);
+		}
+	}
+	else{
+		printf("The list is empty, can't apply the function\n");
+	}
+}
