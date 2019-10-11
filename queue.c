@@ -108,8 +108,8 @@ void qapply(queue_t *qp, void (*fn)(void* elementp)){
 	}
 }
 
-void* qsearch(queue_t *qp,                                                                                                  
-              bool (*searchfn)(void* elementp,const void* keyp),                                                
+void* qsearch(queue_t *qp,
+              bool (*searchfn)(void* elementp,const void* keyp),
               const void* skeyp){
 	iqueue_t *iqp=(iqueue_t*)qp;
 	element_t *ep;
@@ -121,10 +121,9 @@ void* qsearch(queue_t *qp,
 	return NULL;
 }
 
-void* qremove(queue_t *qp,                                                      
-              bool (*searchfn)(void* elementp,const void* keyp),                
+void* qremove(queue_t *qp,
+              bool (*searchfn)(void* elementp,const void* keyp),
               const void* skeyp){
-
 	iqueue_t *iqp=(iqueue_t*)qp;
 	element_t *ep;
 	element_t *prev;
@@ -153,3 +152,15 @@ void* qremove(queue_t *qp,
 	return NULL;
 } 
 
+
+/* concatenatenates elements of q2 into q1
+ * q2 is dealocated, closed, and unusable upon completion
+ */ 
+void qconcat(queue_t *q1p, queue_t *q2p) {
+	iqueue_t *iq1p=(iqueue_t*)q1p;
+	iqueue_t *iq2p=(iqueue_t*)q2p;
+	element_t *front_2=iq2p->front;
+	iq1p->back->next=front_2;
+	iq1p->back=iq2p->back;
+	qclose(iq2p);
+}

@@ -56,10 +56,14 @@ bool searchfn(void* elementp,const void* keyp){
 
 int main(void){
 	queue_t *qp;
+	queue_t *q2p;
 	//queue_t *qp1;
 	car_t *car;
 	car_t *car1;
 	car_t *car2;
+	car_t *car3;
+	car_t *car4;
+	car_t *car5;
 	//car_t *car3;
 	
 	qp=qopen();
@@ -69,13 +73,34 @@ int main(void){
 	qput(qp,(void*)car);
 	qput(qp,(void*)car1);
 	qput(qp,(void*)car2);
+
+
+	q2p=qopen();
+	car3=make_car(2003,500);
+	car4=make_car(2009,100);
+	car5=make_car(2011,7000);
+	qput(q2p,(void*)car3);
+	qput(q2p,(void*)car4);
+	qput(q2p,(void*)car5);
+
+	qapply(qp,print_anything);
+	qapply(q2p,print_anything);
+
+	qconcat(qp,q2p);
 	
+	qapply(qp,print_anything);
+	qapply(q2p,print_anything);
+
+	/*
 	const	int y1=2000;
 	car_t *searchr=(car_t*)qsearch(qp,searchfn,(const void*)&y1);
 	printf("search result:%d\n",searchr->year);
 	car_t *remover=(car_t*)qremove(qp,searchfn,(const void*)&y1);
 	printf("search result:%d\n",remover->year);
 	qapply(qp,print_anything);
+	*/
+	
+
 	/*car_t *rcar=(car_t*)qget(qp);
 	car_t *rcar1=(car_t*)qget(qp);
 	qapply(qp,print_anything);
@@ -103,6 +128,6 @@ int main(void){
 	//	}
 	
 	qclose(qp);
-	free(remover);
+	//free(remover);
 	exit(EXIT_SUCCESS);
 }
