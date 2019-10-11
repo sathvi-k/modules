@@ -99,11 +99,57 @@ void qapply(queue_t *qp, void (*fn)(void* elementp)){
 	iqueue_t *iqp=(iqueue_t*)qp;
 	if (iqp->front!=NULL){
 		element_t *ep;
-		for(ep=front;ep!=NULL;ep=ep->next){
-			fn(ep);
+		for(ep=iqp->front;ep!=NULL;ep=ep->next){
+			fn(ep->data);
 		}
 	}
 	else{
 		printf("The list is empty, can't apply the function\n");
 	}
 }
+
+void* qsearch(queue_t *qp,                                                                                                  
+              bool (*searchfn)(void* elementp,const void* keyp),                                                
+              const void* skeyp){
+	iqueue_t *iqp=(iqueue_t*)qp;
+	element_t *ep;
+	for(ep=iqp->front;ep!=NULL;ep=ep->next){
+		if(searchfn(ep->data,skeyp)==true){
+			return ep->data;
+		}
+	}
+	return NULL;
+}
+
+void* qremove(queue_t *qp,                                                      
+              bool (*searchfn)(void* elementp,const void* keyp),                
+              const void* skeyp){
+
+	iqueue_t *iqp=(iqueue_t*)qp;
+	element_t *ep;
+	element_t *prev;
+	
+	for(ep=iqp->front;ep!=NULL;ep=ep->next){
+		if(searchfn(ep->data,skeyp)==true){
+			if(ep==iqp->front){
+				iqp->front=iqp->front->next;
+				ep->next=NULL;
+				return ep->data;
+			}
+			else if(ep==iqp->back){
+				iqp->back=prev;
+				prev->next=NULL;
+				ep->next=NULL;
+				return ep->data;
+			}
+			else{
+				prev->next=ep->next;
+				ep->next=NULL;
+				return ep->data;
+			}
+		}
+		prev=ep;
+	}
+	return NULL;
+} 
+
