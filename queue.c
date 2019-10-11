@@ -36,6 +36,7 @@ static element_t* create_element(void *elementp){
   return et;
 }
 
+/* create an empty queue */
 queue_t* qopen(void){               
 	iqueue_t *qp;
   if(!(qp=(iqueue_t*)malloc(sizeof(iqueue_t)))){
@@ -47,6 +48,7 @@ queue_t* qopen(void){
   return qp;
 }
 
+/* deallocate a queue, frees everything in it */
 void qclose(queue_t *qp){
 	iqueue_t *iqp=(iqueue_t*)qp;
 	element_t *i=iqp->front;
@@ -61,6 +63,9 @@ void qclose(queue_t *qp){
 	free(iqp);
 }
 
+/* put element at the end of the queue                                          
+ * returns 0 is successful; nonzero otherwise                                   
+ */
 int32_t qput(queue_t *qp,void *elementp){
 	element_t *element=create_element(elementp);
 	iqueue_t *iqp=(iqueue_t*)qp;
@@ -78,6 +83,7 @@ int32_t qput(queue_t *qp,void *elementp){
 	return 1;
 }
 
+/* get the first first element from queue, removing it from the queue */
 void* qget(queue_t *qp){
 	element_t *save=NULL;
 	iqueue_t *iqp=(iqueue_t*)qp;
@@ -95,6 +101,7 @@ void* qget(queue_t *qp){
 	return save->data;
 }
 
+/* apply a function to every element of the queue */
 void qapply(queue_t *qp, void (*fn)(void* elementp)){
 	iqueue_t *iqp=(iqueue_t*)qp;
 	if (iqp->front!=NULL){
@@ -108,6 +115,15 @@ void qapply(queue_t *qp, void (*fn)(void* elementp)){
 	}
 }
 
+/* search a queue using a supplied boolean function                             
+ * skeyp -- a key to search for                                                 
+ * searchfn -- a function applied to every element of the queue                 
+ *          -- elementp - a pointer to an element                               
+ *          -- keyp - the key being searched for (i.e. will be                  
+ *             set to skey at each step of the search                           
+ *          -- returns TRUE or FALSE as defined in bool.h                       
+ * returns a pointer to an element, or NULL if not found                        
+ */
 void* qsearch(queue_t *qp,
               bool (*searchfn)(void* elementp,const void* keyp),
               const void* skeyp){
@@ -121,6 +137,10 @@ void* qsearch(queue_t *qp,
 	return NULL;
 }
 
+/* search a queue using a supplied boolean function (as in qsearch),            
+ * removes the element from the queue and returns a pointer to it or            
+ * NULL if not found                                                            
+ */
 void* qremove(queue_t *qp,
               bool (*searchfn)(void* elementp,const void* keyp),
               const void* skeyp){
