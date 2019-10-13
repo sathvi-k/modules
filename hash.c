@@ -68,34 +68,34 @@ typedef struct ihashtable_t{
 /* hopen -- opens a hash table with initial size hsize */
 hashtable_t *hopen(uint32_t hsize){
 	ihashtable_t *hp;
+	queue_t *qpp;
 	
   if(!(hp=(ihashtable_t *)malloc(sizeof(ihashtable_t)))){                               
     printf("[Error: malloc failed allocating hashtable]\n");                        
     return NULL;                                                                
   }
-
-	queue_t *table[hsize];
 	
+	if(!(qpp=(queue_t**)malloc(hsize*sizeof(queue_t**)))){                               
+    printf("[Error: malloc failed allocating memory]\n");                        
+    return NULL;                                                                }
+  
 	for(int i=0;i<hsize;i++){
 		queue_t *qp=qopen();
-		table[i]=qp;
+		printf("address:%p\n",qpp);
 	}
 	
-	for(int j=0;j<hsize;j++){
-		printf("In table:%p\n",table[j]);
-	}
-	
-	hp->qtable=table;
+	hp->qtable=qpp;
 	hp->size=hsize;
-	
-  return (hashtable_t*)hp;       
+
+	hashtable_t* ht=(hashtable_t*)hp;
+  return ht;       
 }
 
 /* hclose -- closes a hash table */ 
 void hclose(hashtable_t *htp){
 	ihashtable_t *ihtp=(ihashtable_t*)htp;
 	for(int i=0; i<(ihtp->size);i++){
-		printf("freed:%p",ihtp->qtable[i]);
+		printf("freed:%p\n",ihtp->qtable[i]);
 		//qclose(ihtp->qtable[i]);
 	}
 	free(ihtp);
@@ -109,10 +109,10 @@ int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
 	ihashtable_t *ihtp=(ihashtable_t *)htp;
 	uint32_t loc=SuperFastHash(key,keylen,(ihtp->size));
 
-	//printf("loc:%u",loc);
 	printf("loc:%u",loc);
-	printf("queue:%p\n",ihtp->qtable[loc]);
-	printf("3location:%p\n",ihtp->qtable[1]);
+	//	printf("loc:%u",loc);
+	//	printf("queue:%p\n",ihtp->qtable[loc]);
+	//	printf("3location:%p\n",ihtp->qtable[1]);
 	//	qput(qp1,ep);
 	return 0;
 	

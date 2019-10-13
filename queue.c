@@ -45,7 +45,7 @@ queue_t* qopen(void){
   }
   qp->front=NULL;
 	qp->back=NULL;
-	queue_t *qt=qp;
+	queue_t *qt=(void*)qp;
 	return qt;
 }
 
