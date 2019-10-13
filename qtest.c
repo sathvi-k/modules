@@ -69,9 +69,9 @@ int main(void){
 	qp=qopen();
 	car=make_car(2000,200);
 	car1=make_car(2019,1700);
-	car2=make_car(1999,17);
-	qput(qp,(void*)car1);
+	car2=make_car(2000,200);
 	qput(qp,(void*)car);
+	qput(qp,(void*)car1);
 	qput(qp,(void*)car2);
 
 
@@ -91,7 +91,7 @@ int main(void){
 	printf("---------------\n");
 	
 	const	int y1=2000;
-	const int y2=1999;
+	const int y2=2000;
 	car_t *remover=(car_t*)qremove(qp,searchfn,(const void*)&y1);
 	car_t *searchr=(car_t*)qsearch(qp,searchfn,(const void*)&y2);
 	
@@ -105,7 +105,7 @@ int main(void){
 	printf("---------------\n");
 	qapply(qp,print_anything);
 	//	printf("--------------\n");
-	//qapply(q2p,print_anything);
+	//	qapply(q2p,print_anything);
 	printf("search result:%d\n",remover->year);
 	printf("search result:%f\n",searchr->price);
 	/*

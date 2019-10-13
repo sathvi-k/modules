@@ -1,15 +1,15 @@
 CFLAGS=-Wall -pedantic -std=c11 -I. -g
 
-all:	qtest
+all:	qtest htest
 
-queue.o:	queue.c queue.h
-					gcc $(CFLAGS) -c queue.c
-
-qtest.o:	qtest.c queue.h
-					gcc $(CFLAGS) -c qtest.c
+%.o:	%.c %.h
+			gcc $(CFLAGS) -c $<
 
 qtest:	qtest.o queue.o
-				gcc $(CFLAGS) qtest.o queue.o -o qtest
+				gcc $(CFLAGS) qtest.o queue.o -o $@
+
+htest: htest.o hash.o queue.o
+				gcc $(CFLAGS) htest.o hash.o queue.o -o $@
 
 clean:
-				rm -f *.o qtest
+				rm -f *.o qtest htest

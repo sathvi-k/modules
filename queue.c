@@ -72,7 +72,7 @@ int32_t qput(queue_t *qp,void *elementp){
 	iqueue_t *iqp=(iqueue_t*)qp;
 	int32_t return_var=1;
 	
-	if(iqp->front==NULL && iqp->back==NULL){
+	if((iqp->front==NULL) && (iqp->back==NULL)){
 		iqp->front=element;
 		iqp->back=element;
 		return_var=0;

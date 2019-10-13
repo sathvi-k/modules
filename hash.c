@@ -3,6 +3,11 @@
  *
  */
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "hash.h"
+#include "queue.h"
 
 /* 
  * SuperFastHash() -- produces a number between 0 and the tablesize-1.
@@ -55,3 +60,81 @@ static uint32_t SuperFastHash (const char *data,int len,uint32_t tablesize) {
   return hash % tablesize;
 }
 
+typedef struct ihashtable_t{
+  int size;
+	queue_t **qtable;
+}ihashtable_t;
+
+/* hopen -- opens a hash table with initial size hsize */
+hashtable_t *hopen(uint32_t hsize){
+	ihashtable_t *hp;
+	
+  if(!(hp=(ihashtable_t *)malloc(sizeof(ihashtable_t)))){                               
+    printf("[Error: malloc failed allocating hashtable]\n");                        
+    return NULL;                                                                
+  }
+
+	queue_t *table[hsize];
+	
+	for(int i=0;i<hsize;i++){
+		queue_t *qp=qopen();
+		table[i]=qp;
+	}
+	
+	for(int j=0;j<hsize;j++){
+		printf("In table:%p\n",table[j]);
+	}
+	
+	hp->qtable=table;
+	hp->size=hsize;
+	
+  return (hashtable_t*)hp;       
+}
+
+/* hclose -- closes a hash table */ 
+void hclose(hashtable_t *htp){
+	ihashtable_t *ihtp=(ihashtable_t*)htp;
+	for(int i=0; i<(ihtp->size);i++){
+		printf("freed:%p",ihtp->qtable[i]);
+		//qclose(ihtp->qtable[i]);
+	}
+	free(ihtp);
+}
+
+/* hput -- puts an entry into a hash table under designated key
+ * returns 0 for success; non-zero otherwise
+ */
+int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
+	
+	ihashtable_t *ihtp=(ihashtable_t *)htp;
+	uint32_t loc=SuperFastHash(key,keylen,(ihtp->size));
+
+	//printf("loc:%u",loc);
+	printf("loc:%u",loc);
+	printf("queue:%p\n",ihtp->qtable[loc]);
+	printf("3location:%p\n",ihtp->qtable[1]);
+	//	qput(qp1,ep);
+	return 0;
+	
+}
+                                                                                                                                         
+/* happly -- applies a function to every entry in hash table*/                                                                           
+//void happly(hashtable_t *htp, void (*fn)(void* ep));                                                                                     
+                                                                                                                                         
+/* hsearch -- searchs for an entry under a designated key using a                                                                        
+ * designated search fn -- returns a pointer to the entry or NULL if                                                                     
+ * not found                                                                                                                             
+ */                                                                                                                                      
+//void *hsearch(hashtable_t *htp,                                                                                                          
+//      bool (*searchfn)(void* elementp, const void* searchkeyp),                                                                        
+//      const char *key,                                                                                                                 
+//       int32_t keylen);                                                                                                                 
+                                                                                                                                         
+/* hremove -- removes and returns an entry under a designated key                                                                        
+ * using a designated search fn -- returns a pointer to the entry or                                                                     
+ * NULL if not found                                                                                                                     
+ */                                                                                                                                      
+//void *hremove(hashtable_t *htp,                                                                     
+//      bool (*searchfn)(void* elementp, const void* searchkeyp),
+//const char *key,
+				//      int32_t keylen); 
