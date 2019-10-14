@@ -72,7 +72,7 @@ int main(void){
 	int32_t resc = hput(ht,(void*)&car2,&cc,sizeof(car2));
 	int32_t resd = hput(ht,(void*)&car3,&cd,sizeof(car3));
 	int32_t rese = hput(ht,(void*)&car4,&ce,sizeof(car4));
-	happly(ht,print_anything);
+	//	happly(ht,print_anything);
 	hclose(ht);
 	
 	if (resa==0 && resb==0 && resc==0 && resd==0 && rese==0) {

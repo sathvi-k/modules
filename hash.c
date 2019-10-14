@@ -75,12 +75,14 @@ hashtable_t *hopen(uint32_t hsize){
     return NULL;                                                                
   }
 	
-	if(!(qpp=(queue_t**)malloc(hsize*sizeof(queue_t*)))){                               
-    printf("[Error: malloc failed allocating memory]\n");                        
-    return NULL;                                                                }
+	if(!(qpp=(queue_t**)calloc(hsize,sizeof(queue_t*)))){
+    printf("[Error: malloc failed allocating memory]\n");    
+    return NULL;
+	}
   
 	for(int i=0;i<hsize;i++){
 		queue_t *qp=qopen();
+		//hp->qtable[i]=(*qpp);
 		qpp[i]=qp;
 	}
 	
@@ -94,10 +96,21 @@ hashtable_t *hopen(uint32_t hsize){
 /* hclose -- closes a hash table */ 
 void hclose(hashtable_t *htp){
 	ihashtable_t *ihtp=(ihashtable_t*)htp;
-	for(int i=0; i<(ihtp->size);i++){
-		printf("freed:%p\n",ihtp->qtable[i]);
-		//		qclose(ihtp->qtable[i]);
+	int s=ihtp->size;
+	for(int i=0; i<s;i++){
+		if((ihtp->qtable[i])!=NULL){
+			printf("pointers of hashtable are NOT null");
+		}
+		//printf("freed:%p\n",ihtp->qtable[i]->);
+		queue_t **queue=ihtp->qtable[i];
+		//printf("hello");
+		queue_t *qp=(*queue);
+		if(qp==NULL){
+			printf("qp is NULL");
+		}
+		qclose(qp);
 	}
+	free(ihtp->qtable);
 	free(ihtp);
 }
 
@@ -110,8 +123,7 @@ int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
 	uint32_t loc=SuperFastHash(key,keylen,(ihtp->size));
 
 	//printf("loc:%u",loc);
-	printf("loc:%u",loc);
-	queue_t *qp1=ihtp->qtable[loc];
+	queue_t **qp1=ihtp->qtable[loc];
 	//	printf("3location:%p\n",ihtp->qtable[1]);
 	qput(qp1,ep);
 	return 0;
@@ -121,7 +133,7 @@ int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
 /* happly -- applies a function to every entry in hash table*/
 void happly(hashtable_t *htp, void (*fn)(void* ep)){
 	ihashtable_t *ihtp=(ihashtable_t *)htp;
-	for(int i=0; i<(ihtp->size);i++){                                                              
+	for(int i=0; i<(ihtp->size);i++){                                       
     qapply(ihtp->qtable[i],fn);
   }  
 }                                                                                     
