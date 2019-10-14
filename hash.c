@@ -68,20 +68,20 @@ typedef struct ihashtable_t{
 /* hopen -- opens a hash table with initial size hsize */
 hashtable_t *hopen(uint32_t hsize){
 	ihashtable_t *hp;
-	queue_t *qpp;
+	queue_t **qpp;
 	
   if(!(hp=(ihashtable_t *)malloc(sizeof(ihashtable_t)))){                               
     printf("[Error: malloc failed allocating hashtable]\n");                        
     return NULL;                                                                
   }
 	
-	if(!(qpp=(queue_t**)malloc(hsize*sizeof(queue_t**)))){                               
+	if(!(qpp=(queue_t**)malloc(hsize*sizeof(queue_t*)))){                               
     printf("[Error: malloc failed allocating memory]\n");                        
     return NULL;                                                                }
   
 	for(int i=0;i<hsize;i++){
 		queue_t *qp=qopen();
-		printf("address:%p\n",qpp);
+		qpp[i]=qp;
 	}
 	
 	hp->qtable=qpp;
@@ -96,7 +96,7 @@ void hclose(hashtable_t *htp){
 	ihashtable_t *ihtp=(ihashtable_t*)htp;
 	for(int i=0; i<(ihtp->size);i++){
 		printf("freed:%p\n",ihtp->qtable[i]);
-		//qclose(ihtp->qtable[i]);
+		//		qclose(ihtp->qtable[i]);
 	}
 	free(ihtp);
 }
@@ -109,17 +109,22 @@ int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
 	ihashtable_t *ihtp=(ihashtable_t *)htp;
 	uint32_t loc=SuperFastHash(key,keylen,(ihtp->size));
 
+	//printf("loc:%u",loc);
 	printf("loc:%u",loc);
-	//	printf("loc:%u",loc);
-	//	printf("queue:%p\n",ihtp->qtable[loc]);
+	queue_t *qp1=ihtp->qtable[loc];
 	//	printf("3location:%p\n",ihtp->qtable[1]);
-	//	qput(qp1,ep);
+	qput(qp1,ep);
 	return 0;
 	
 }
-                                                                                                                                         
-/* happly -- applies a function to every entry in hash table*/                                                                           
-//void happly(hashtable_t *htp, void (*fn)(void* ep));                                                                                     
+                                                                                                                                
+/* happly -- applies a function to every entry in hash table*/
+void happly(hashtable_t *htp, void (*fn)(void* ep)){
+	ihashtable_t *ihtp=(ihashtable_t *)htp;
+	for(int i=0; i<(ihtp->size);i++){                                                              
+    qapply(ihtp->qtable[i],fn);
+  }  
+}                                                                                     
                                                                                                                                          
 /* hsearch -- searchs for an entry under a designated key using a                                                                        
  * designated search fn -- returns a pointer to the entry or NULL if                                                                     
