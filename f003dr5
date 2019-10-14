@@ -201,9 +201,6 @@ void qconcat(queue_t *q1p, queue_t *q2p) {
 	}
 	else if(iq1p->front==NULL && iq2p->front!=NULL){
 		iq1p->front=iq2p->front;
-		iq1p->back=iq2p->back;
-		iq2p->front=NULL;
-		iq2p->back=NULL;
 		qclose(iq2p);
 	}
 	else if(iq1p->front!=NULL && iq2p->front==NULL){

@@ -1,6 +1,6 @@
 /* 
  * hash.c -- implements a generic hash table as an indexed set of queues.
- *
+ * Author:John B Kariuki Jr.
  */
 #include <stdint.h>
 #include <stdbool.h>
