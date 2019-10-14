@@ -70,9 +70,9 @@ hashtable_t *hopen(uint32_t hsize){
 	ihashtable_t *hp;
 	queue_t **qpp;
 	
-  if(!(hp=(ihashtable_t *)malloc(sizeof(ihashtable_t)))){                               
-    printf("[Error: malloc failed allocating hashtable]\n");                        
-    return NULL;                                                                
+  if(!(hp=(ihashtable_t *)malloc(sizeof(ihashtable_t)))){         
+    printf("[Error: malloc failed allocating hashtable]\n");
+    return NULL;
   }
 	
 	if(!(qpp=(queue_t**)calloc(hsize,sizeof(queue_t*)))){
@@ -82,7 +82,6 @@ hashtable_t *hopen(uint32_t hsize){
   
 	for(int i=0;i<hsize;i++){
 		queue_t *qp=qopen();
-		//hp->qtable[i]=(*qpp);
 		qpp[i]=qp;
 	}
 	
@@ -97,18 +96,10 @@ hashtable_t *hopen(uint32_t hsize){
 void hclose(hashtable_t *htp){
 	ihashtable_t *ihtp=(ihashtable_t*)htp;
 	int s=ihtp->size;
+	
 	for(int i=0; i<s;i++){
-		if((ihtp->qtable[i])!=NULL){
-			printf("pointers of hashtable are NOT null");
-		}
-		//printf("freed:%p\n",ihtp->qtable[i]->);
-		queue_t **queue=ihtp->qtable[i];
-		//printf("hello");
-		queue_t *qp=(*queue);
-		if(qp==NULL){
-			printf("qp is NULL");
-		}
-		qclose(qp);
+		queue_t *queue=ihtp->qtable[i];
+		qclose(queue);
 	}
 	free(ihtp->qtable);
 	free(ihtp);
@@ -121,37 +112,55 @@ int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
 	
 	ihashtable_t *ihtp=(ihashtable_t *)htp;
 	uint32_t loc=SuperFastHash(key,keylen,(ihtp->size));
-
+	
 	//printf("loc:%u",loc);
-	queue_t **qp1=ihtp->qtable[loc];
-	//	printf("3location:%p\n",ihtp->qtable[1]);
+	queue_t *qp1=ihtp->qtable[loc];
 	qput(qp1,ep);
 	return 0;
 	
 }
-                                                                                                                                
+
 /* happly -- applies a function to every entry in hash table*/
 void happly(hashtable_t *htp, void (*fn)(void* ep)){
 	ihashtable_t *ihtp=(ihashtable_t *)htp;
-	for(int i=0; i<(ihtp->size);i++){                                       
-    qapply(ihtp->qtable[i],fn);
+	for(int i=0; i<(ihtp->size);i++){
+		queue_t *qp=ihtp->qtable[i];
+    qapply(qp,fn);
   }  
-}                                                                                     
-                                                                                                                                         
-/* hsearch -- searchs for an entry under a designated key using a                                                                        
- * designated search fn -- returns a pointer to the entry or NULL if                                                                     
- * not found                                                                                                                             
- */                                                                                                                                      
-//void *hsearch(hashtable_t *htp,                                                                                                          
-//      bool (*searchfn)(void* elementp, const void* searchkeyp),                                                                        
-//      const char *key,                                                                                                                 
-//       int32_t keylen);                                                                                                                 
-                                                                                                                                         
+}
+
+/* hsearch -- searchs for an entry under a designated key using a
+ * designated search fn -- returns a pointer to the entry or NULL if
+ * not found
+ */                                              
+void *hsearch(hashtable_t *htp,
+							bool (*searchfn)(void* elementp, const void* searchkeyp),
+							const char *key,
+							int32_t keylen){
+	
+	ihashtable_t *ihtp=(ihashtable_t*)htp;
+	uint32_t loc=SuperFastHash(key,keylen,(ihtp->size));
+
+	queue_t *qp=ihtp->qtable[loc];
+	void* searchr=qsearch(qp,searchfn,(const void*)key);
+	
+	return searchr;
+}
+
 /* hremove -- removes and returns an entry under a designated key                                                                        
  * using a designated search fn -- returns a pointer to the entry or                                                                     
  * NULL if not found                                                                                                                     
  */                                                                                                                                      
-//void *hremove(hashtable_t *htp,                                                                     
-//      bool (*searchfn)(void* elementp, const void* searchkeyp),
-//const char *key,
-				//      int32_t keylen); 
+void *hremove(hashtable_t *htp,                                                                     
+							bool (*searchfn)(void* elementp, const void* searchkeyp),
+							const char *key,
+				      int32_t keylen){
+	
+	ihashtable_t *ihtp=(ihashtable_t*)htp;
+	uint32_t loc=SuperFastHash(key,keylen,(ihtp->size));
+		
+	queue_t *qp=ihtp->qtable[loc];
+	void* remover=qremove(qp,searchfn,(const void*)key);
+	
+	return remover;
+} 

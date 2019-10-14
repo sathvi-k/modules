@@ -29,8 +29,8 @@ void happly(hashtable_t *htp, void (*fn)(void* ep));
  */
 void *hsearch(hashtable_t *htp, 
 	      bool (*searchfn)(void* elementp, const void* searchkeyp), 
-	      const char *key, 
-	      int32_t keylen);
+							const char *key, 
+							int32_t keylen);
 
 /* hremove -- removes and returns an entry under a designated key
  * using a designated search fn -- returns a pointer to the entry or
